@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+</head>
+<body>
+    <ul id="notificaciones"></ul>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:8080");
+
+        ws.onopen = () => {
+            console.log("Conexión establecida");
+            ws.send(JSON.stringify({ action: "getNotificaciones" }));
+        };
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            switch (message.event) {
+                case "getNotificaciones":
+                    displayNotificaciones(message.data);
+                    break;
+                case "notificacionCreada":
+                    displayNotificacion(message.data);
+                    break;
+            }
+        };
+
+        function displayNotificaciones(notificaciones) {
+            const notificacionesList = document.getElementById("notificaciones");
+            notificacionesList.innerHTML = "";
+            notificaciones.forEach((notificacion) => {
+                const li = document.createElement("li");
+                li.textContent = notificacion.cuerpo;
+                notificacionesList.appendChild(li);
+            });
+        }
+
+        function displayNotificacion(notificacion) {
+            const notificacionesList = document.getElementById("notificaciones");
+            const li = document.createElement("li");
+            li.textContent = notificacion.cuerpo;
+            notificacionesList.appendChild(li);
+        }
+    </script>
+</body>
+</html>
